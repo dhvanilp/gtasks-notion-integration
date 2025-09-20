@@ -13,7 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-SYNC_INTERVAL=600  # 10 minutes in seconds
+SYNC_INTERVAL=900  # 15 minutes in seconds
 LOG_DIR="/app/logs"
 LOG_FILE="$LOG_DIR/sync-$(date +%Y%m%d).log"
 
@@ -29,9 +29,29 @@ log() {
     echo "[$timestamp] [$level] $message" | tee -a "$LOG_FILE"
 }
 
+# Function to check if it's night time (00:00 - 04:00)
+is_night_time() {
+    local hour=$(date +%H)
+    # Convert to number to handle leading zeros
+    hour=$((10#$hour))
+    
+    if [ $hour -ge 0 ] && [ $hour -lt 4 ]; then
+        return 0  # It is night time
+    else
+        return 1  # It is not night time
+    fi
+}
+
 # Function to run sync
 run_sync() {
     local start_time=$(date +%s)
+    
+    # Check if it's night time
+    if is_night_time; then
+        log "INFO" "🌙 Skipping sync during night hours (00:00 - 04:00)"
+        echo -e "${BLUE}🌙 Skipping sync during night hours (00:00 - 04:00)${NC}"
+        return 0
+    fi
     
     log "INFO" "🚀 Starting GTasks-Notion sync..."
     
@@ -61,7 +81,7 @@ trap 'log "INFO" "🛑 Received shutdown signal, exiting gracefully..."; exit 0'
 
 # Initial startup message
 echo -e "${BLUE}🐳 GTasks-Notion Integration Docker Container Starting...${NC}"
-log "INFO" "🐳 Container started with sync interval: ${SYNC_INTERVAL}s (10 minutes)"
+log "INFO" "🐳 Container started with sync interval: ${SYNC_INTERVAL}s (15 minutes)"
 
 # Verify Python environment
 if ! python --version; then
@@ -97,8 +117,8 @@ echo -e "${YELLOW}🔄 Running initial sync...${NC}"
 run_sync
 
 # Main sync loop
-log "INFO" "📅 Starting periodic sync loop (every 10 minutes)"
-echo -e "${BLUE}📅 Sync will run every 10 minutes. Press Ctrl+C to stop.${NC}"
+log "INFO" "📅 Starting periodic sync loop (every 15 minutes, paused 00:00-04:00)"
+echo -e "${BLUE}📅 Sync will run every 15 minutes (paused 00:00-04:00). Press Ctrl+C to stop.${NC}"
 
 while true; do
     # Wait for the specified interval
