@@ -1,0 +1,47 @@
+# Docker Configuration for Google Tasks and Notion Integration
+# Copy this to config.yaml when using Docker
+
+# Notion Configuration
+notion:
+  token: "your_notion_integration_token_here"
+  database_id: "your_notion_database_id_here"
+  page_url_root: "https://www.notion.so/your-workspace/"
+
+# Google Tasks Configuration
+google_tasks:
+  # These paths are correct for the Docker container
+  client_secret_file: "client_secret.json"
+  token_file: "token.pkl"
+
+# Timezone Settings
+timezone:
+  name: "Asia/Kolkata"
+  offset_from_gmt: "+05:30"
+
+# Sync Settings
+sync:
+  past_weeks: 4
+  future_weeks: 10
+
+# Default List Configuration
+default_list:
+  name: "List"
+  id: "your_default_google_tasks_list_id"
+
+# Notion Database Field Names
+notion_fields:
+  task_name: "Name"
+  status: "Done"
+  category: "Category"
+  due_date: "Due Date"
+  description: "Description"
+  gtasks_task_id: "GTasks Task ID"
+  gtasks_list_id: "GTasks List ID"
+  last_synced: "Last Synced"
+
+# Project Configuration for Docker
+project:
+  # This should be true for Docker environments
+  docker_env: true
+  # Local path is ignored in Docker
+  local_path: "/app/"

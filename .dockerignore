@@ -1,0 +1,86 @@
+# Git files
+.git
+.gitignore
+.github
+
+# Python cache and virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Test files
+tests/
+test_*
+*_test.py
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs and temporary files
+*.log
+logs/
+*.tmp
+*.temp
+
+# Data files that shouldn't be in image
+*.csv
+*.json.bak
+*.json.old
+backup_*
+
+# Docker files (don't include Docker files in the image)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Development files
+.env*
+.local
+.cache/
+
+# API response files (these are just for debugging)
+gtasks_api_response.json
+notion_api_response.json
+
+# Dump files
+dump_*
+ttdb.csv
+
+# Any credential files that might exist
+credentials.json
+token.json
+client_secret*.json
+
+# Python distribution files
+dist/
+build/
+*.egg-info/

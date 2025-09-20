@@ -1,0 +1,1 @@
+"""Google Tasks and Notion sync application"""

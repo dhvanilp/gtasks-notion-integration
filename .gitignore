@@ -13,6 +13,35 @@ __pycache__
 roughWork.py
 setupDup.py
 
-# Credentials
+# Credentials & Secrets
 client_secret.json
 token.pkl
+config.yaml
+*.json
+!category_list_mapping.json
+!requirements.txt
+
+# API responses & dumps
+*_api_response.json
+gtasks_api_response.json
+notion_api_response.json
+
+# Data files
+*.csv
+*.pkl
+dump/
+logs/
+
+# IDE files
+.DS_Store
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+
+# SSH Keys
+*.pub
+dhvanilp
+id_rsa*
+*.pem
