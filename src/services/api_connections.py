@@ -34,19 +34,42 @@ class APIConnections:
             self._refresh_google_tasks_token()
     
     def _refresh_google_tasks_token(self):
-        """Refresh the Google Tasks API token"""
+        """Refresh the Google Tasks API token using OAuth flow"""
         try:
-            os.system('python ' + PROJECT_LOCATION + 'gTasksApiToken.py')
+            from google.auth.transport.requests import Request
+            from google_auth_oauthlib.flow import InstalledAppFlow
             
-            credentials = pickle.load(open(PROJECT_LOCATION + 'token.pkl', 'rb'))
-            self.service = build('tasks', 'v1', credentials=credentials)
+            # OAuth 2.0 scopes for Google Tasks
+            SCOPES = ['https://www.googleapis.com/auth/tasks']
             
-            # Test the refreshed connection
+            creds = None
+            # Load existing token if available
+            token_file = PROJECT_LOCATION + 'token.pkl'
+            if os.path.exists(token_file):
+                with open(token_file, 'rb') as token:
+                    creds = pickle.load(token)
+            
+            # If there are no valid credentials, let the user log in
+            if not creds or not creds.valid:
+                if creds and creds.expired and creds.refresh_token:
+                    creds.refresh(Request())
+                else:
+                    flow = InstalledAppFlow.from_client_secrets_file(
+                        PROJECT_LOCATION + 'client_secret.json', SCOPES)
+                    creds = flow.run_local_server(port=0)
+                
+                # Save the credentials for the next run
+                with open(token_file, 'wb') as token:
+                    pickle.dump(creds, token)
+            
+            self.service = build('tasks', 'v1', credentials=creds)
+            
+            # Test the connection
             test_list = self.service.tasklists().get(tasklist=DEFAULT_LIST_ID).execute()
             print("Successfully refreshed the Google Tasks API token!\n")
             
         except Exception as e:
-            print("Could not refresh the Google Tasks API token!\n")
+            print(f"Could not refresh the Google Tasks API token: {e}\n")
             raise Exception("Failed to establish Google Tasks API connection")
     
     def _setup_notion(self):
