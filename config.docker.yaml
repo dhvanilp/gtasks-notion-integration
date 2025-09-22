@@ -33,6 +33,7 @@ notion_fields:
   task_name: "Name"
   status: "Done"
   category: "Category"
+  date: "Date"
   due_date: "Due Date"
   description: "Description"
   gtasks_task_id: "GTasks Task ID"

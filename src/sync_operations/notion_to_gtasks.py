@@ -207,7 +207,7 @@ def _extract_notion_task_data(page):
     except:
         gtasks_status = GOOGLE_TO_DO_STATUS
 
-    # Get date
+    # Get date from the Date field (not Due Date)
     try:
         task_date = parse_datetime_string(
             page['properties'][NOTION_DATE]['date']['start'][:-6], 
@@ -253,7 +253,7 @@ def _extract_notion_task_data(page):
 
 
 def _update_notion_after_gtasks_creation(page_id, gtasks_id, task_data):
-    """Update Notion task after Google Task creation with icon"""
+    """Update Notion task after Google Task creation with icon and set Due Date"""
     from src.services.api_connections import notion
     from src.services.notion_service import notion_service
     
@@ -261,28 +261,45 @@ def _update_notion_after_gtasks_creation(page_id, gtasks_id, task_data):
     notion_status = task_data['gtasks_status'] == GOOGLE_DONE_STATUS
     task_icon = notion_service._get_task_icon(notion_status, task_data['notion_list_name'])
     
+    # Prepare properties to update
+    properties = {
+        NOTION_GTASKS_TASK_ID: {
+            'rich_text': [{'text': {'content': gtasks_id}}]
+        },
+        NOTION_GTASKS_LIST_ID: {
+            'rich_text': [{'text': {'content': task_data['gtasks_list_id']}}]
+        },
+        NOTION_LAST_SYNCED: {
+            'date': {
+                'start': add_timezone_for_notion(
+                    datetime_to_string(datetime.now())
+                ),
+                'end': None
+            }
+        }
+    }
+    
+    # If task has a date, set Due Date to Date + 1 week
+    if task_data['date']:
+        try:
+            from src.utils.date_helpers import add_week_to_date_string
+            due_date_str = add_week_to_date_string(task_data['date'])
+            properties[NOTION_DUE_DATE] = {
+                'date': {
+                    'start': due_date_str,
+                    'end': None
+                }
+            }
+        except Exception as e:
+            print(f"Warning: Could not set due date for task {task_data['title']}: {e}")
+    
     notion.pages.update(
         page_id=page_id,
         icon={
             'type': 'emoji',
             'emoji': task_icon
         },
-        properties={
-            NOTION_GTASKS_TASK_ID: {
-                'rich_text': [{'text': {'content': gtasks_id}}]
-            },
-            NOTION_GTASKS_LIST_ID: {
-                'rich_text': [{'text': {'content': task_data['gtasks_list_id']}}]
-            },
-            NOTION_LAST_SYNCED: {
-                'date': {
-                    'start': add_timezone_for_notion(
-                        datetime_to_string(datetime.now())
-                    ),
-                    'end': None
-                }
-            }
-        }
+        properties=properties
     )
 
     # Set default list if empty

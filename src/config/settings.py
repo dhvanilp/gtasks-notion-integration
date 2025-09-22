@@ -67,7 +67,8 @@ LIST_DICTIONARY = {
 NOTION_TASK_NAME = config['notion_fields']['task_name']
 NOTION_STATUS = config['notion_fields']['status']
 NOTION_LIST_NAME = config['notion_fields']['category']
-NOTION_DATE = config['notion_fields']['due_date']
+NOTION_DATE = config['notion_fields']['date']
+NOTION_DUE_DATE = config['notion_fields']['due_date']
 NOTION_DESCRIPTION = config['notion_fields']['description']
 
 # Integration fields

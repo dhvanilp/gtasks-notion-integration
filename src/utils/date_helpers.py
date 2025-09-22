@@ -42,3 +42,24 @@ def add_timezone_for_notion(datetime_string):
 def convert_timezone(date_time, new_timezone=TIMEZONE):
     """Convert dateTime from UTC to newTimeZone"""
     return utc.localize(date_time).astimezone(timezone(new_timezone)).replace(tzinfo=None)
+
+
+def add_week_to_date_string(date_string):
+    """Add one week to a date string and return as date string"""
+    try:
+        # Try parsing as datetime first
+        if 'T' in date_string:
+            dt = parse_datetime_string(date_string.split('T')[0] + 'T00:00:00', '%Y-%m-%dT%H:%M:%S')
+        else:
+            # Parse as date only
+            dt = parse_date_string(date_string, '%Y-%m-%d')
+        
+        # Add one week
+        new_date = dt + timedelta(weeks=1)
+        
+        # Return as date string (YYYY-MM-DD format)
+        return date_to_string(new_date.date() if hasattr(new_date, 'date') else new_date)
+        
+    except Exception as e:
+        print(f"Error parsing date string '{date_string}': {e}")
+        return None

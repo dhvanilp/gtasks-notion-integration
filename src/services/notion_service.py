@@ -50,18 +50,36 @@ class NotionService:
             }
         )
         
-        # Handle due date if present
+        # Handle date if present
         if isinstance(task_date, date):
-            notion.pages.update(
-                page_id=new_task['id'],
-                properties={
-                    NOTION_DATE: {
-                        'date': {
-                            'start': date_to_string(task_date),
-                            'end': None
-                        }
+            # Set the Date field
+            date_str = date_to_string(task_date)
+            
+            # Also calculate Due Date as Date + 1 week
+            from src.utils.date_helpers import add_week_to_date_string
+            due_date_str = add_week_to_date_string(date_str)
+            
+            properties_to_update = {
+                NOTION_DATE: {
+                    'date': {
+                        'start': date_str,
+                        'end': None
                     }
                 }
+            }
+            
+            # Add Due Date if calculation succeeded
+            if due_date_str:
+                properties_to_update[NOTION_DUE_DATE] = {
+                    'date': {
+                        'start': due_date_str,
+                        'end': None
+                    }
+                }
+            
+            notion.pages.update(
+                page_id=new_task['id'],
+                properties=properties_to_update
             )
 
         print(f'Adding this task to Notion: {task_name}\n')
@@ -118,24 +136,44 @@ class NotionService:
             }
         )
 
-        # Handle due date
+        # Handle date update
         if isinstance(task_date, date):
-            notion.pages.update(
-                page_id=updated_task['id'],
-                properties={
-                    NOTION_DATE: {
-                        'date': {
-                            'start': date_to_string(task_date),
-                            'end': None
-                        }
+            # Set the Date field
+            date_str = date_to_string(task_date)
+            
+            # Also calculate Due Date as Date + 1 week
+            from src.utils.date_helpers import add_week_to_date_string
+            due_date_str = add_week_to_date_string(date_str)
+            
+            properties_to_update = {
+                NOTION_DATE: {
+                    'date': {
+                        'start': date_str,
+                        'end': None
                     }
                 }
+            }
+            
+            # Add Due Date if calculation succeeded
+            if due_date_str:
+                properties_to_update[NOTION_DUE_DATE] = {
+                    'date': {
+                        'start': due_date_str,
+                        'end': None
+                    }
+                }
+            
+            notion.pages.update(
+                page_id=updated_task['id'],
+                properties=properties_to_update
             )
         else:
+            # Clear both Date and Due Date fields
             notion.pages.update(
                 page_id=updated_task['id'],
                 properties={
-                    NOTION_DATE: {'date': None}
+                    NOTION_DATE: {'date': None},
+                    NOTION_DUE_DATE: {'date': None}
                 }
             )
 
